@@ -115,7 +115,7 @@ module HtmlPress
             in_script -= 1
             if in_script == 0 then
               js = buffer.join("\n")
-              js_compressed = HtmlPress.js_compressor js, @options[:js_minifier_options]
+              js_compressed = HtmlPress.js_compressor js, @options[:js_minifier_options], @options[:cache]
               res << js_compressed
             end
           end
@@ -146,7 +146,7 @@ module HtmlPress
             in_script -= 1
             if in_script == 0 then
               css = buffer.join("\n")
-              res << (HtmlPress.style_compressor css)
+              res << (HtmlPress.style_compressor css, @options[:cache])
             end
           end
         end
