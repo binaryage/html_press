@@ -35,7 +35,6 @@ module HtmlPress
       out = process_html_comments out
       out = trim_lines out
       out = process_block_elements out
-
       out = process_whitespaces out
 
       out = process_attributes out
@@ -57,11 +56,17 @@ module HtmlPress
       level = 0
       in_script = 0
       in_style = 0
+      in_code = 0
+      in_pre = 0
       res = []
       out.split("\n").each do |line|
         pre_level = level
 
         line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
+          in_code+=1 if $1 == "code"
+          in_code-=1 if $1 == "/code"
+          in_pre-=1 if $1 == "pre"
+          in_pre-=1 if $1 == "/pre"
           if $1 == "script" then
             level += 1
             in_script += 1
@@ -82,6 +87,7 @@ module HtmlPress
         end
 
         level < pre_level ? i = level : i = pre_level
+        i = 0 if (in_code>0 or in_pre>0) and level <= pre_level
         res << (("  " * i) + line)
       end
 
@@ -192,9 +198,24 @@ module HtmlPress
 
     # replace two or more whitespaces with one
     def process_whitespaces (out)
-      out.gsub!(/[\r\n]+/, @options[:strip_crlf] ? ' ' : "\n")
-      out.gsub!(/[ \t]+/, ' ')
-      out
+      out.gsub!(/[\r\n]+/, "\n")
+
+      in_code = 0
+      in_pre = 0
+      res = []
+      out.split("\n").each do |line|
+        line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
+          in_code+=1 if $1 == "code"
+          in_code-=1 if $1 == "/code"
+          in_pre-=1 if $1 == "pre"
+          in_pre-=1 if $1 == "/pre"
+        end
+
+        line.gsub!(/[ \t]+/, ' ') unless in_code>0 or in_pre>0
+        res << line
+      end
+
+      res.join("\n")
     end
 
     def log (text)
