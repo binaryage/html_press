@@ -33,9 +33,9 @@ module HtmlPress
 
     def return_code_blocks(html)
       counter = 0
-      html.gsub /##HTMLPRESSCODEBLOCK##/i do |m|
+      html.gsub "##HTMLPRESSCODEBLOCK##" do |m|
         counter+=1
-        @code_blocks[counter]
+        @code_blocks[counter-1]
       end
     end
 
