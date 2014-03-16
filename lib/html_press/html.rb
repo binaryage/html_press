@@ -20,15 +20,31 @@ module HtmlPress
         raise ArgumentError, 'Logger has no error method'
       end
     end
+    
+    def extract_code_blocks(html)
+      @code_blocks = []
+      counter = 0
+      html.gsub /<code>(.*?)<\/code>/mi do |m|
+        counter+=1
+        @code_blocks << $1
+        "<code>##HTMLPRESSCODEBLOCK##<\/code>"
+      end
+    end
+
+    def return_code_blocks(html)
+      counter = 0
+      html.gsub /##HTMLPRESSCODEBLOCK##/i do |m|
+        counter+=1
+        @code_blocks[counter]
+      end
+    end
 
     def press (html)
       out = html.respond_to?(:read) ? html.read : html.dup
 
-      @replacement_hash = 'MINIFYHTML' + Time.now.to_i.to_s
-
+      out = extract_code_blocks out
       out.gsub! "\r", ''
 
-      # out = process_ie_conditional_comments out
       out = process_scripts out
       out = process_styles out
 
@@ -43,6 +59,7 @@ module HtmlPress
       out.gsub! /^$\n/, '' # remove empty lines
 
       out = reindent out
+      out = return_code_blocks out
 
       out
     end
