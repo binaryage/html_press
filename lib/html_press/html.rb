@@ -125,65 +125,23 @@ module HtmlPress
     end
 
     def process_scripts (out)
-      in_script = 0
-      res = []
-      buffer = []
-      out.split("\n").each do |line|
-        was_inscript = in_script
-        line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
-          if $1 == "script" then
-            in_script += 1
-            buffer = []
-          elsif $1 == "/script"
-            in_script -= 1
-            if in_script == 0 then
-              js = buffer.join("\n")
-              js_compressed = HtmlPress.js_compressor js, @options[:js_minifier_options], @options[:cache]
-              res << js_compressed
-            end
-          end
-          m
-        end
-
-        if was_inscript > 0 and in_script > 0 then
-          buffer << line
-        else
-          res << line
-        end
+      out.gsub /(<script.*?>)(.*?)(<\/script>)/im do |m|
+        pre = $1
+        post = $3
+        compressed_js = HtmlPress.js_compressor $2, @options[:js_minifier_options], @options[:cache]
+        "#{pre}#{compressed_js}#{post}"
       end
-
-      res.join("\n")
     end
 
-     def process_styles (out)
-      in_script = 0
-      res = []
-      buffer = []
-      out.split("\n").each do |line|
-        was_instyle = in_script
-        line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
-          if $1 == "style" then
-            in_script += 1
-            buffer = []
-          elsif $1 == "/style"
-            in_script -= 1
-            if in_script == 0 then
-              css = buffer.join("\n")
-              res << (HtmlPress.style_compressor css, @options[:cache])
-            end
-          end
-        end
-
-        if was_instyle > 0 and in_script > 0 then
-          buffer << line
-        else
-          res << line
-        end
+    def process_styles (out)
+      out.gsub /(<style.*?>)(.*?)(<\/style>)/im do |m|
+        pre = $1
+        post = $3
+        compressed_css = HtmlPress.style_compressor $2, @options[:cache]
+        "#{pre}#{compressed_css}#{post}"
       end
-
-      res.join("\n")
     end
-
+    
     # remove html comments (not IE conditional comments)
     def process_html_comments (out)
       out.gsub /<!--([ \t]*?)-->/, ''
