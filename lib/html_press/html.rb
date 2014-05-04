@@ -119,7 +119,7 @@ module HtmlPress
 
     def fixup_void_elements (out)
       # http://dev.w3.org/html5/spec/syntax.html#void-elements
-      out.gsub /<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)([^>]*?)[\/]*>/i do |m|
+      out.gsub /<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr|path|rect)([^>]*?)[\/]*>/i do |m|
         "<"+$1+$2+"/>"
       end
     end
