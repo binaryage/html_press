@@ -13,11 +13,20 @@ module HtmlPress
         cache_hit = File.join(my_cache_dir, sha)
         return File.read(cache_hit) if File.exists? cache_hit
       end
-      res = Uglifier.new(options).compile(text).gsub(/;$/,'')
-      if cache_hit then
-        FileUtils.mkdir_p(my_cache_dir)
-        File.open(cache_hit, 'w') {|f| f.write(res) }
+      begin
+        res = Uglifier.new(options).compile(text).gsub(/;$/, '')
+        if cache_hit then
+          FileUtils.mkdir_p(my_cache_dir)
+          File.open(cache_hit, 'w') { |f| f.write(res) }
+        end
+      rescue => e
+        puts "Uglifier problem with code snippet:\n"
+        puts "---\n"
+        puts text
+        puts "---\n"
+        raise e
       end
+
       res
     end
   rescue LoadError => e
