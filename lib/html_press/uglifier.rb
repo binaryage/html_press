@@ -6,7 +6,6 @@ module HtmlPress
     # Available options https://github.com/lautis/uglifier#options
     def self.js_compressor (text, options = nil, cache_dir=nil)
       options ||= {}
-      options[:squeeze] = false
       if cache_dir then
         my_cache_dir = File.join(cache_dir, "js")
         sha = Digest::SHA1.hexdigest text
