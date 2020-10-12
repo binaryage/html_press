@@ -82,7 +82,7 @@ module HtmlPress
         line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
           in_code+=1 if $1 == "code"
           in_code-=1 if $1 == "/code"
-          in_pre-=1 if $1 == "pre"
+          in_pre+=1 if $1 == "pre"
           in_pre-=1 if $1 == "/pre"
           if $1 == "script" then
             level += 1
@@ -182,7 +182,7 @@ module HtmlPress
         line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
           in_code+=1 if $1 == "code"
           in_code-=1 if $1 == "/code"
-          in_pre-=1 if $1 == "pre"
+          in_pre+=1 if $1 == "pre"
           in_pre-=1 if $1 == "/pre"
         end
 
