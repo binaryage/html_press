@@ -27,7 +27,7 @@ module HtmlPress
       html.gsub /<code>(.*?)<\/code>/mi do |m|
         counter+=1
         @code_blocks << $1
-        "<code>##HTMLPRESSCODEBLOCK##<\/code>"
+        "<code>##HTMLPRESSCODEBLOCK##</code>"
       end
     end
 
