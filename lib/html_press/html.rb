@@ -39,9 +39,28 @@ module HtmlPress
       end
     end
 
+    def extract_pre_blocks(html)
+      @pre_blocks = []
+      counter = 0
+      html.gsub /<pre>(.*?)<\/pre>/mi do |_|
+        counter+=1
+        @pre_blocks << $1
+        "<pre>##HTMLPRESSPREBLOCK##</pre>"
+      end
+    end
+
+    def return_pre_blocks(html)
+      counter = 0
+      html.gsub "##HTMLPRESSPREBLOCK##" do |_|
+        counter+=1
+        @pre_blocks[counter-1]
+      end
+    end
+
     def press (html)
       out = html.respond_to?(:read) ? html.read : html.dup
 
+      out = extract_pre_blocks out
       out = extract_code_blocks out
       out.gsub! "\r", ''
 
@@ -59,7 +78,9 @@ module HtmlPress
       out.gsub! /^$\n/, '' # remove empty lines
 
       out = reindent out
-      return_code_blocks out
+      out = return_code_blocks out
+      out = return_pre_blocks out
+      out
     end
 
     # for backward compatibility
