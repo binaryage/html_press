@@ -24,7 +24,7 @@ module HtmlPress
     def extract_code_blocks(html)
       @code_blocks = []
       counter = 0
-      html.gsub /<code>(.*?)<\/code>/mi do |m|
+      html.gsub /<code>(.*?)<\/code>/mi do |_|
         counter+=1
         @code_blocks << $1
         "<code>##HTMLPRESSCODEBLOCK##</code>"
@@ -33,7 +33,7 @@ module HtmlPress
 
     def return_code_blocks(html)
       counter = 0
-      html.gsub "##HTMLPRESSCODEBLOCK##" do |m|
+      html.gsub "##HTMLPRESSCODEBLOCK##" do |_|
         counter+=1
         @code_blocks[counter-1]
       end
@@ -59,9 +59,7 @@ module HtmlPress
       out.gsub! /^$\n/, '' # remove empty lines
 
       out = reindent out
-      out = return_code_blocks out
-
-      out
+      return_code_blocks out
     end
 
     # for backward compatibility
@@ -84,12 +82,12 @@ module HtmlPress
           in_code-=1 if $1 == "/code"
           in_pre+=1 if $1 == "pre"
           in_pre-=1 if $1 == "/pre"
-          if $1 == "script" then
+          if $1 == "script"
             level += 1
             in_script += 1
           end
           in_script -= 1 if $1 == "/script"
-          if $1 == "style" then
+          if $1 == "style"
             level += 1
             in_style += 1
           end
@@ -112,20 +110,20 @@ module HtmlPress
     end
 
     def process_attributes (out)
-      out.gsub /<([a-z\-:]+)([^>]*?)([\/]*?)>/i do |m|
+      out.gsub /<([a-z\-:]+)([^>]*?)([\/]*?)>/i do |_|
         "<"+$1+($2.gsub(/[\n]+/, ' ').gsub(/[ ]+/, ' ').rstrip)+">"
       end
     end
 
     def fixup_void_elements (out)
       # http://dev.w3.org/html5/spec/syntax.html#void-elements
-      out.gsub /<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr|path|rect)([^>]*?)[\/]*>/i do |m|
+      out.gsub /<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr|path|rect)([^>]*?)[\/]*>/i do |_|
         "<"+$1+$2+"/>"
       end
     end
 
     def process_scripts (out)
-      out.gsub /(<script.*?>)(.*?)(<\/script>)/im do |m|
+      out.gsub /(<script.*?>)(.*?)(<\/script>)/im do |_|
         pre = $1
         post = $3
         compressed_js = HtmlPress.js_compressor $2, @options[:js_minifier_options], @options[:cache]
@@ -134,7 +132,7 @@ module HtmlPress
     end
 
     def process_styles (out)
-      out.gsub /(<style.*?>)(.*?)(<\/style>)/im do |m|
+      out.gsub /(<style.*?>)(.*?)(<\/style>)/im do |_|
         pre = $1
         post = $3
         compressed_css = HtmlPress.style_compressor $2, @options[:cache]
@@ -179,7 +177,7 @@ module HtmlPress
       in_pre = 0
       res = []
       out.split("\n").each do |line|
-        line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |m|
+        line.gsub /<([\/]*[a-z\-:]+)([^>]*?)>/i do |_|
           in_code+=1 if $1 == "code"
           in_code-=1 if $1 == "/code"
           in_pre+=1 if $1 == "pre"
